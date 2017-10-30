@@ -7,7 +7,7 @@ REG_URL="registry.example.com"
 if [ ! -f /dev/mapper/docker--pool-thinpool ];then
     sudo pvcreate $DEVS
     sudo vgcreate docker-pool $DEVS
-    sudo lvcreate --wipesignatures y -n thinpool-pool docker-pool -l 95%VG
+    sudo lvcreate --wipesignatures y -n thinpool docker-pool -l 95%VG
     sudo lvcreate --wipesignatures y -n thinpoolmeta docker-pool -l 1%VG
     sudo lvconvert -y --zero n -c 512K --thinpool docker-pool/thinpool --poolmetadata docker-pool/thinpoolmeta
     sudo lvchange --metadataprofile docker-thinpool docker-pool/thinpool
