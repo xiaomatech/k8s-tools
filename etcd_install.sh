@@ -4,7 +4,7 @@ id etcd >& /dev/null
 if [ $? -ne 0 ]
 then
    groupadd etcd
-    useradd etcd -g etcd
+    useradd etcd -g etcd -s /sbin/nologin
 fi
 
 SERVER_IP=`/sbin/ifconfig  | grep 'inet'| grep -v '127.0.0.1' |head -n1 |tr -s ' '|cut -d ' ' -f3 | cut -d: -f2`

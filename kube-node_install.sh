@@ -6,7 +6,7 @@ id kube >& /dev/null
 if [ $? -ne 0 ]
 then
    groupadd kube
-   useradd -g kube kube
+   useradd -g kube kube -s /sbin/nologin
 fi
 
 SERVER_IP=`/sbin/ifconfig  | grep 'inet'| grep -v '127.0.0.1' |head -n1 |tr -s ' '|cut -d ' ' -f3 | cut -d: -f2`
@@ -55,15 +55,15 @@ WorkingDirectory=/var/lib/kubelet
 EnvironmentFile=-/etc/kubernetes/config
 EnvironmentFile=-/etc/kubernetes/kubelet
 ExecStart=/usr/bin/kubelet \
-	    $KUBE_LOGTOSTDERR \
-	    $KUBE_LOG_LEVEL \
-	    $KUBELET_API_SERVER \
-	    $KUBELET_ADDRESS \
-	    $KUBELET_PORT \
-	    $KUBELET_HOSTNAME \
-	    $KUBE_ALLOW_PRIV \
-	    $KUBELET_POD_INFRA_CONTAINER \
-	    $KUBELET_ARGS
+    $KUBE_LOGTOSTDERR \
+    $KUBE_LOG_LEVEL \
+    $KUBELET_API_SERVER \
+    $KUBELET_ADDRESS \
+    $KUBELET_PORT \
+    $KUBELET_HOSTNAME \
+    $KUBE_ALLOW_PRIV \
+    $KUBELET_POD_INFRA_CONTAINER \
+    $KUBELET_ARGS
 Restart=on-failure
 KillMode=process
 
@@ -76,7 +76,7 @@ KUBELET_ADDRESS="--address='$SERVER_IP'"
 KUBELET_PORT="--port=10250"
 KUBELET_HOSTNAME="--hostname-override='$HOSTNAME'"
 KUBELET_POD_INFRA_CONTAINER="--pod-infra-container-image=registry.meizu.com/common/pause-amd64:3.0"
-KUBELET_ARGS="--cgroup-driver=systemd --cluster-dns='$CLUSTER_DNS_SVC_IP' --cluster-domain='$CLUSTER_DNS_DOMAIN' --serialize-image-pulls=false --register-node=true --logtostderr=true --feature-gates="AllAlpha=true,Accelerators=true,AdvancedAuditing=true,ExperimentalCriticalPodAnnotation=true,TaintBasedEvictions=true" --v=2"
+KUBELET_ARGS="--cgroup-driver=systemd --cluster-dns='$CLUSTER_DNS_SVC_IP' --cluster-domain='$CLUSTER_DNS_DOMAIN' --serialize-image-pulls=false --register-node=true --logtostderr=true --feature-gates=AllAlpha=true,Accelerators=true,AdvancedAuditing=true,ExperimentalCriticalPodAnnotation=true,TaintBasedEvictions=true --v=2"
 '>/etc/kubernetes/kubelet
 
 echo -ne '
@@ -89,10 +89,10 @@ After=network.target
 EnvironmentFile=-/etc/kubernetes/config
 EnvironmentFile=-/etc/kubernetes/proxy
 ExecStart=/usr/bin/kube-proxy \
-	    $KUBE_LOGTOSTDERR \
-	    $KUBE_LOG_LEVEL \
-	    $KUBE_MASTER \
-	    $KUBE_PROXY_ARGS
+    $KUBE_LOGTOSTDERR \
+    $KUBE_LOG_LEVEL \
+    $KUBE_MASTER \
+    $KUBE_PROXY_ARGS
 Restart=on-failure
 LimitNOFILE=65536
 
@@ -101,7 +101,7 @@ WantedBy=multi-user.target
 '>/usr/lib/systemd/system/kube-proxy.service
 
 echo -ne '
-KUBE_PROXY_ARGS="--address='$SERVER_IP' --hostname-override='$HOSTNAME' --cluster-cidr='$CLUSTER_CIDR' --logtostderr=true --v=2"
+KUBE_PROXY_ARGS=" --bind-address='$SERVER_IP' --hostname-override='$HOSTNAME' --cluster-cidr='$CLUSTER_CIDR' --logtostderr=true"
 '>/etc/kubernetes/proxy
 
 echo -ne '[Manager]

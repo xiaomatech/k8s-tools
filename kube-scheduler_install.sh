@@ -6,7 +6,7 @@ id kube >& /dev/null
 if [ $? -ne 0 ]
 then
    groupadd kube
-   useradd -g kube kube
+   useradd -g kube kube -s /sbin/nologin
 fi
 
 SERVER_IP=`/sbin/ifconfig  | grep 'inet'| grep -v '127.0.0.1' |head -n1 |tr -s ' '|cut -d ' ' -f3 | cut -d: -f2`
@@ -47,10 +47,10 @@ EnvironmentFile=-/etc/kubernetes/config
 EnvironmentFile=-/etc/kubernetes/scheduler
 User=kube
 ExecStart=/usr/bin/kube-scheduler \
-	    $KUBE_LOGTOSTDERR \
-	    $KUBE_LOG_LEVEL \
-	    $KUBE_MASTER \
-	    $KUBE_SCHEDULER_ARGS
+    $KUBE_LOGTOSTDERR \
+    $KUBE_LOG_LEVEL \
+    $KUBE_MASTER \
+    $KUBE_SCHEDULER_ARGS
 Restart=on-failure
 LimitNOFILE=65536
 

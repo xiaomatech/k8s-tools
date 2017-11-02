@@ -6,7 +6,7 @@ id kube >& /dev/null
 if [ $? -ne 0 ]
 then
    groupadd kube
-   useradd -g kube kube
+   useradd -g kube kube -s /sbin/nologin
 fi
 
 SERVER_IP=`/sbin/ifconfig  | grep 'inet'| grep -v '127.0.0.1' |head -n1 |tr -s ' '|cut -d ' ' -f3 | cut -d: -f2`
@@ -41,16 +41,15 @@ EnvironmentFile=-/etc/kubernetes/config
 EnvironmentFile=-/etc/kubernetes/apiserver
 User=kube
 ExecStart=/usr/bin/kube-apiserver \
-	    $KUBE_LOGTOSTDERR \
-	    $KUBE_LOG_LEVEL \
-	    $KUBE_ETCD_SERVERS \
-	    $KUBE_API_ADDRESS \
-	    $KUBE_API_PORT \
-	    $KUBELET_PORT \
-	    $KUBE_ALLOW_PRIV \
-	    $KUBE_SERVICE_ADDRESSES \
-	    $KUBE_ADMISSION_CONTROL \
-	    $KUBE_API_ARGS
+    $KUBE_LOGTOSTDERR \
+    $KUBE_LOG_LEVEL \
+    $KUBE_ETCD_SERVERS \
+    $KUBE_API_ADDRESS \
+    $KUBE_API_PORT \
+    $KUBE_ALLOW_PRIV \
+    $KUBE_SERVICE_ADDRESSES \
+    $KUBE_ADMISSION_CONTROL \
+    $KUBE_API_ARGS
 Restart=on-failure
 Type=notify
 LimitNOFILE=65536
@@ -68,9 +67,8 @@ KUBE_MASTER="--master='$KUBE_APISERVER'"
 '>/etc/kubernetes/config
 
 echo -ne '
-KUBE_API_PORT="--port=8080"
-KUBELET_PORT="--kubelet-port=10250"
-KUBE_API_ADDRESS="--advertise-address='$SERVER_IP'--bind-address='$SERVER_IP' --insecure-bind-address='$SERVER_IP'
+KUBE_API_PORT="--insecure-port=8080"
+KUBE_API_ADDRESS="--advertise-address='$SERVER_IP' --bind-address='$SERVER_IP' --insecure-bind-address='$SERVER_IP'"
 KUBE_ETCD_SERVERS="--etcd-servers='$ETCD_ENDPOINTS'"
 KUBE_SERVICE_ADDRESSES="--service-cluster-ip-range='$SERVICE_CIDR' --service-node-port-range=8400-32767"
 KUBE_ADMISSION_CONTROL="--admission-control=NamespaceLifecycle,DenyEscalatingExec,LimitRanger,ServiceAccount,ResourceQuota,PodSecurityPolicy,DefaultStorageClass"
