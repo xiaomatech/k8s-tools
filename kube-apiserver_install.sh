@@ -67,12 +67,12 @@ KUBE_MASTER="--master='$KUBE_APISERVER'"
 '>/etc/kubernetes/config
 
 echo -ne '
-KUBE_API_PORT="--insecure-port=8080"
+KUBE_API_PORT="--insecure-port=8080 --secure-port=443"
 KUBE_API_ADDRESS="--advertise-address='$SERVER_IP' --bind-address='$SERVER_IP' --insecure-bind-address='$SERVER_IP'"
 KUBE_ETCD_SERVERS="--etcd-servers='$ETCD_ENDPOINTS'"
 KUBE_SERVICE_ADDRESSES="--service-cluster-ip-range='$SERVICE_CIDR' --service-node-port-range=8400-32767"
 KUBE_ADMISSION_CONTROL="--admission-control=NamespaceLifecycle,DenyEscalatingExec,LimitRanger,ServiceAccount,ResourceQuota,PodSecurityPolicy,DefaultStorageClass"
-KUBE_API_ARGS="--audit-log-maxage=30 --audit-log-maxbackup=3 --audit-log-maxsize=100 --audit-log-path=/var/log/audit.log --runtime-config=extensions/v1beta1=true,extensions/v1beta1/networkpolicies=true,rbac.authorization.k8s.io/v1beta1=true,extensions/v1beta1/podsecuritypolicy=true --feature-gates=AllAlpha=true,Accelerators=true,AdvancedAuditing=true,ExperimentalCriticalPodAnnotation=true,TaintBasedEvictions=true --v=2"
+KUBE_API_ARGS="--max-requests-inflight=10000 --audit-log-maxage=30 --audit-log-maxbackup=3 --audit-log-maxsize=100 --audit-log-path=/var/log/audit.log --feature-gates=AllAlpha=true,Accelerators=true,AdvancedAuditing=true,ExperimentalCriticalPodAnnotation=true,TaintBasedEvictions=true,PodPriority=true --v=2"
 '>/etc/kubernetes/apiserver
 
 echo -ne '[Manager]

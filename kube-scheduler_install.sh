@@ -59,7 +59,7 @@ WantedBy=multi-user.target
 '>/usr/lib/systemd/system/kube-scheduler.service
 
 echo -ne '
-KUBE_SCHEDULER_ARGS=" --leader-elect=true --address='$SERVER_IP' --v=2"
+KUBE_SCHEDULER_ARGS=" --leader-elect=true --address='$SERVER_IP' --feature-gates=AllAlpha=true,Accelerators=true,AdvancedAuditing=true,ExperimentalCriticalPodAnnotation=true,TaintBasedEvictions=true,PodPriority=true"
 '>/etc/kubernetes/scheduler
 
 echo -ne '[Manager]

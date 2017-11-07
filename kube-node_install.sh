@@ -76,7 +76,7 @@ KUBELET_ADDRESS="--address='$SERVER_IP'"
 KUBELET_PORT="--port=10250"
 KUBELET_HOSTNAME="--hostname-override='$HOSTNAME'"
 KUBELET_POD_INFRA_CONTAINER="--pod-infra-container-image=registry.meizu.com/common/pause-amd64:3.0"
-KUBELET_ARGS="--cgroup-driver=systemd --fail-swap-on=false --cluster-dns='$CLUSTER_DNS_SVC_IP' --cluster-domain='$CLUSTER_DNS_DOMAIN' --serialize-image-pulls=false --register-node=true --logtostderr=true --feature-gates=AllAlpha=true,Accelerators=true,AdvancedAuditing=true,ExperimentalCriticalPodAnnotation=true,TaintBasedEvictions=true --v=2"
+KUBELET_ARGS="--runtime-cgroups=/systemd/system.slice --cgroup-driver=systemd --fail-swap-on=false --cluster-dns='$CLUSTER_DNS_SVC_IP' --cluster-domain='$CLUSTER_DNS_DOMAIN' --serialize-image-pulls=false --logtostderr=true --feature-gates=AllAlpha=true,Accelerators=true,AdvancedAuditing=true,ExperimentalCriticalPodAnnotation=true,TaintBasedEvictions=true --v=2"
 '>/etc/kubernetes/kubelet
 
 echo -ne '
@@ -101,7 +101,7 @@ WantedBy=multi-user.target
 '>/usr/lib/systemd/system/kube-proxy.service
 
 echo -ne '
-KUBE_PROXY_ARGS=" --bind-address='$SERVER_IP' --hostname-override='$HOSTNAME' --cluster-cidr='$CLUSTER_CIDR' --logtostderr=true"
+KUBE_PROXY_ARGS=" --bind-address='$SERVER_IP' --hostname-override='$HOSTNAME' --cluster-cidr='$CLUSTER_CIDR' --logtostderr=true --feature-gates=AllAlpha=true"
 '>/etc/kubernetes/proxy
 
 echo -ne '[Manager]

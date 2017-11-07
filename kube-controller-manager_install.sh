@@ -59,7 +59,7 @@ WantedBy=multi-user.target
 '>/usr/lib/systemd/system/kube-controller-manager.service
 
 echo -ne '
-KUBE_CONTROLLER_MANAGER_ARGS=" --address='$SERVER_IP' --service-cluster-ip-range='$SERVICE_CIDR' --cluster-name=kubernetes --allocate-node-cidrs=true --leader-elect=true --v=2"
+KUBE_CONTROLLER_MANAGER_ARGS=" --address='$SERVER_IP' --service-cluster-ip-range='$SERVICE_CIDR' --cluster-name=kubernetes --leader-elect=true --enable-dynamic-provisioning=true --feature-gates=AllAlpha=true --cloud-config= --cloud-provider="
 '>/etc/kubernetes/controller-manager
 
 echo -ne '[Manager]

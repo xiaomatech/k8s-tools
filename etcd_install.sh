@@ -53,7 +53,8 @@ ExecStart=/usr/bin/etcd \
     --advertise-client-urls ${ETCD_ADVERTISE_CLIENT_URLS} \
     --initial-cluster-token ${ETCD_INITIAL_CLUSTER_TOKEN} \
     --initial-cluster ${ETCD_INITIAL_CLUSTER} \
-    --initial-cluster-state ${ETCD_INITIAL_CLUSTER_STATE}
+    --initial-cluster-state ${ETCD_INITIAL_CLUSTER_STATE} \
+    --enable-v2
 Restart=on-failure
 RestartSec=5
 LimitNOFILE=65536
