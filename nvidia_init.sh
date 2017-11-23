@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+
+nvidia-modprobe -u -m
+
 modprobe nvidia
 
 if [ "$?" -eq 0 ]; then

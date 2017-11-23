@@ -7,7 +7,7 @@
 #rm -rf /var/cuda-repo-9-0-local
 #yum remove -y cuda-repo-rhel7-9-0-local
 #cd /data/yum && sudo createrepo 7
-sudo yum install kernel-devel-`uname -r` kernel-headers-`uname -r` cuda
+sudo yum install kernel-devel-`uname -r` kernel-headers-`uname -r` cuda nvidia-docker2
 
 #install cudnn
 #https://developer.nvidia.com/rdp/cudnn-download

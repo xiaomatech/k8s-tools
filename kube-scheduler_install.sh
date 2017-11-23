@@ -1,6 +1,18 @@
 #!/usr/bin/env bash
 
-. environment.sh
+sudo mkdir -p /etc/cni/net.d /etc/kubernetes /etc/kubernetes/ssl /var/log/kube
+
+if [ ! -f /etc/kubernetes/environment.sh ] ; then
+    wget http://assets.example.com/k8s/environment.sh -O /etc/kubernetes/environment.sh
+fi
+
+source /etc/kubernetes/environment.sh
+
+if [ ! -f /etc/kubernetes/token.csv ] ; then
+    wget http://assets.example.com/k8s/ca.tar.gz -O /tmp/ca.tar.gz
+    sudo tar -zxvf /tmp/ca.tar.gz -C /etc/kubernetes/
+    rm -rf /tmp/ca.tar.gz
+fi
 
 id kube >& /dev/null
 if [ $? -ne 0 ]
@@ -11,8 +23,6 @@ fi
 
 SERVER_IP=`/sbin/ifconfig  | grep 'inet'| grep -v '127.0.0.1' |head -n1 |tr -s ' '|cut -d ' ' -f3 | cut -d: -f2`
 HOSTNAME=`hostname -f`
-
-sudo mkdir -p /etc/cni/net.d /etc/kubernetes /etc/kubernetes/ssl
 
 if [ ! -f /usr/bin/kube-scheduler ] ; then
     wget http://assets.example.com/k8s/kube-scheduler -O /usr/bin/kube-scheduler
@@ -31,8 +41,8 @@ if [ ! -f /usr/sbin/pipework ];then
 fi
 
 echo -ne '
-KUBE_LOGTOSTDERR="--logtostderr=true"
-KUBE_LOG_LEVEL="--v=0"
+KUBE_LOGTOSTDERR="--logtostderr=false --log-dir=/var/log/kube"
+KUBE_LOG_LEVEL="--v=4"
 KUBE_ALLOW_PRIV="--allow-privileged=true"
 KUBE_MASTER="--master='$KUBE_APISERVER'"
 '>/etc/kubernetes/config
@@ -70,6 +80,7 @@ DefaultMemoryAccounting=yes
 echo -ne 'd /var/run/kubernetes 0755 kube kube -
 '>/usr/lib/tmpfiles.d/kubernetes.conf
 
+chown -R kube:kube /etc/kubernetes /var/log/kube
 
 systemctl daemon-reload
 systemctl enable kube-scheduler

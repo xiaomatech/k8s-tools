@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 
-# TLS Bootstrapping 使用的 Token，可以使用命令 head -c 16 /dev/urandom | od -An -t x | tr -d ' ' 生成
-BOOTSTRAP_TOKEN="fff35e745a1d85f186c2cb303eea4b7e"
-
 # 建议用 未用的网段 来定义服务网段和 Pod 网段
 
 # 服务网段 (Service CIDR），部署前路由不可达，部署后集群内使用 IP:Port 可达

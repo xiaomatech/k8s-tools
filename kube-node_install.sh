@@ -1,6 +1,18 @@
 #!/usr/bin/env bash
 
-. environment.sh
+sudo mkdir -p /etc/cni/net.d /etc/kubernetes /etc/kubernetes/ssl /etc/kubernetes/manifests /var/log/kube
+
+if [ ! -f /etc/kubernetes/environment.sh ] ; then
+    wget http://assets.example.com/k8s/environment.sh -O /etc/kubernetes/environment.sh
+fi
+
+source /etc/kubernetes/environment.sh
+
+if [ ! -f /etc/kubernetes/token.csv ] ; then
+    wget http://assets.example.com/k8s/ca.tar.gz -O /tmp/ca.tar.gz
+    sudo tar -zxvf /tmp/ca.tar.gz -C /etc/kubernetes/
+    rm -rf /tmp/ca.tar.gz
+fi
 
 id kube >& /dev/null
 if [ $? -ne 0 ]
@@ -11,8 +23,6 @@ fi
 
 SERVER_IP=`/sbin/ifconfig  | grep 'inet'| grep -v '127.0.0.1' |head -n1 |tr -s ' '|cut -d ' ' -f3 | cut -d: -f2`
 HOSTNAME=`hostname -f`
-
-sudo mkdir -p /etc/cni/net.d /etc/kubernetes /etc/kubernetes/ssl
 
 if [ ! -f /usr/bin/kubelet ] ; then
     wget http://assets.example.com/k8s/kubelet -O /usr/bin/kubelet
@@ -37,8 +47,8 @@ if [ ! -f /usr/sbin/pipework ];then
 fi
 
 echo -ne '
-KUBE_LOGTOSTDERR="--logtostderr=true"
-KUBE_LOG_LEVEL="--v=0"
+KUBE_LOGTOSTDERR="--logtostderr=false --log-dir=/var/log/kube"
+KUBE_LOG_LEVEL="--v=4"
 KUBE_ALLOW_PRIV="--allow-privileged=true"
 KUBE_MASTER="--master='$KUBE_APISERVER'"
 '>/etc/kubernetes/config
@@ -75,8 +85,8 @@ echo -ne '
 KUBELET_ADDRESS="--address='$SERVER_IP'"
 KUBELET_PORT="--port=10250"
 KUBELET_HOSTNAME="--hostname-override='$HOSTNAME'"
-KUBELET_POD_INFRA_CONTAINER="--pod-infra-container-image=registry.meizu.com/common/pause-amd64:3.0"
-KUBELET_ARGS="--runtime-cgroups=/systemd/system.slice --cgroup-driver=systemd --fail-swap-on=false --cluster-dns='$CLUSTER_DNS_SVC_IP' --cluster-domain='$CLUSTER_DNS_DOMAIN' --serialize-image-pulls=false --logtostderr=true --feature-gates=AllAlpha=true,Accelerators=true,AdvancedAuditing=true,ExperimentalCriticalPodAnnotation=true,TaintBasedEvictions=true --v=2"
+KUBELET_POD_INFRA_CONTAINER="--pod-infra-container-image=registry.example.com/kube/pause-amd64:3.0"
+KUBELET_ARGS="--pod-manifest-path=/etc/kubernetes/manifests --runtime-cgroups=/systemd/system.slice --cgroup-driver=systemd --bootstrap-kubeconfig=/etc/kubernetes/bootstrap.kubeconfig --kubeconfig=/etc/kubernetes/kubelet.kubeconfig --require-kubeconfig --cert-dir=/etc/kubernetes/ssl --cluster-dns='$CLUSTER_DNS_SVC_IP' --cluster-domain='$CLUSTER_DNS_DOMAIN' --serialize-image-pulls=false --register-node=true --logtostderr=true --feature-gates=AllAlpha=true,Accelerators=true,AdvancedAuditing=true,ExperimentalCriticalPodAnnotation=true,TaintBasedEvictions=true,PodPriority=true  "
 '>/etc/kubernetes/kubelet
 
 echo -ne '
@@ -101,7 +111,7 @@ WantedBy=multi-user.target
 '>/usr/lib/systemd/system/kube-proxy.service
 
 echo -ne '
-KUBE_PROXY_ARGS=" --bind-address='$SERVER_IP' --hostname-override='$HOSTNAME' --cluster-cidr='$CLUSTER_CIDR' --logtostderr=true --feature-gates=AllAlpha=true"
+KUBE_PROXY_ARGS="--kubeconfig=/etc/kubernetes/kube-proxy.kubeconfig --bind-address='$SERVER_IP' --hostname-override='$HOSTNAME' --cluster-cidr='$CLUSTER_CIDR' --logtostderr=true --feature-gates=AllAlpha=true"
 '>/etc/kubernetes/proxy
 
 echo -ne '[Manager]
@@ -111,6 +121,21 @@ DefaultMemoryAccounting=yes
 
 echo -ne 'd /var/run/kubernetes 0755 kube kube -
 '>/usr/lib/tmpfiles.d/kubernetes.conf
+
+
+if [ ! -f /etc/kubernetes/token.csv ];then
+    wget http://yum.meizu.mz/k8s/ssl/token.csv -O /etc/kubernetes/token.csv
+fi
+
+if [ ! -f /etc/kubernetes/bootstrap.kubeconfig ];then
+    wget http://yum.meizu.mz/k8s/ssl/bootstrap.kubeconfig -O /etc/kubernetes/bootstrap.kubeconfig
+fi
+
+if [ ! -f /etc/kubernetes/kube-proxy.kubeconfig ];then
+    wget http://yum.meizu.mz/k8s/ssl/kube-proxy.kubeconfig -O /etc/kubernetes/kube-proxy.kubeconfig
+fi
+
+chown -R kube:kube /etc/kubernetes /var/log/kube
 
 systemctl daemon-reload
 systemctl enable kube-proxy

@@ -1,6 +1,18 @@
 #!/usr/bin/env bash
 
-. environment.sh
+sudo mkdir -p /etc/cni/net.d /etc/kubernetes /etc/kubernetes/ssl /var/log/kube
+
+if [ ! -f /etc/kubernetes/environment.sh ] ; then
+    wget http://assets.example.com/k8s/environment.sh -O /etc/kubernetes/environment.sh
+fi
+
+source /etc/kubernetes/environment.sh
+
+if [ ! -f /etc/kubernetes/token.csv ] ; then
+    wget http://assets.example.com/k8s/ca.tar.gz -O /tmp/ca.tar.gz
+    sudo tar -zxvf /tmp/ca.tar.gz -C /etc/kubernetes/
+    rm -rf /tmp/ca.tar.gz
+fi
 
 id kube >& /dev/null
 if [ $? -ne 0 ]
@@ -11,8 +23,6 @@ fi
 
 SERVER_IP=`/sbin/ifconfig  | grep 'inet'| grep -v '127.0.0.1' |head -n1 |tr -s ' '|cut -d ' ' -f3 | cut -d: -f2`
 HOSTNAME=`hostname -f`
-
-sudo mkdir -p /etc/cni/net.d /etc/kubernetes /etc/kubernetes/ssl
 
 if [ ! -f /usr/bin/kube-apiserver ] ; then
     wget http://assets.example.com/k8s/kube-apiserver -O /usr/bin/kube-apiserver
@@ -60,8 +70,8 @@ WantedBy=multi-user.target
 
 
 echo -ne '
-KUBE_LOGTOSTDERR="--logtostderr=true"
-KUBE_LOG_LEVEL="--v=0"
+KUBE_LOGTOSTDERR="--logtostderr=false --log-dir=/var/log/kube"
+KUBE_LOG_LEVEL="--v=4"
 KUBE_ALLOW_PRIV="--allow-privileged=true"
 KUBE_MASTER="--master='$KUBE_APISERVER'"
 '>/etc/kubernetes/config
@@ -70,9 +80,9 @@ echo -ne '
 KUBE_API_PORT="--insecure-port=8080 --secure-port=443"
 KUBE_API_ADDRESS="--advertise-address='$SERVER_IP' --bind-address='$SERVER_IP' --insecure-bind-address='$SERVER_IP'"
 KUBE_ETCD_SERVERS="--etcd-servers='$ETCD_ENDPOINTS'"
-KUBE_SERVICE_ADDRESSES="--service-cluster-ip-range='$SERVICE_CIDR' --service-node-port-range=8400-32767"
-KUBE_ADMISSION_CONTROL="--admission-control=NamespaceLifecycle,DenyEscalatingExec,LimitRanger,ServiceAccount,ResourceQuota,PodSecurityPolicy,DefaultStorageClass"
-KUBE_API_ARGS="--max-requests-inflight=10000 --audit-log-maxage=30 --audit-log-maxbackup=3 --audit-log-maxsize=100 --audit-log-path=/var/log/audit.log --feature-gates=AllAlpha=true,Accelerators=true,AdvancedAuditing=true,ExperimentalCriticalPodAnnotation=true,TaintBasedEvictions=true,PodPriority=true --v=2"
+KUBE_SERVICE_ADDRESSES="--service-cluster-ip-range='$SERVICE_CIDR' --service-node-port-range=8400-32767 --tls-cert-file=/etc/kubernetes/ssl/kubernetes.pem --tls-private-key-file=/etc/kubernetes/ssl/kubernetes-key.pem --client-ca-file=/etc/kubernetes/ssl/ca.pem --service-account-key-file=/etc/kubernetes/ssl/ca-key.pem "
+KUBE_ADMISSION_CONTROL="--admission-control=NamespaceLifecycle,LimitRanger,ServiceAccount,ResourceQuota,PodSecurityPolicy,DefaultStorageClass,PersistentVolumeClaimResize,PodNodeSelector,PodPreset,PodTolerationRestriction,Priority,DefaultTolerationSeconds"
+KUBE_API_ARGS="--runtime-config=api/all=true --authorization-mode=RBAC --max-requests-inflight=10000 --audit-log-maxage=30 --audit-log-maxbackup=3 --audit-log-maxsize=100 --audit-log-path=/var/log/audit.log --feature-gates=AllAlpha=true,Accelerators=true,AdvancedAuditing=true,ExperimentalCriticalPodAnnotation=true,TaintBasedEvictions=true,PodPriority=true "
 '>/etc/kubernetes/apiserver
 
 echo -ne '[Manager]
@@ -82,6 +92,8 @@ DefaultMemoryAccounting=yes
 
 echo -ne 'd /var/run/kubernetes 0755 kube kube -
 '>/usr/lib/tmpfiles.d/kubernetes.conf
+
+chown -R kube:kube /etc/kubernetes /var/log/kube
 
 systemctl daemon-reload
 systemctl enable kube-apiserver
