@@ -176,7 +176,7 @@ cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=/etc/kubernetes/ca/ca-config
 # TLS Bootstrapping 使用的 Token
 BOOTSTRAP_TOKEN=$(head -c 16 /dev/urandom | od -An -t x | tr -d ' ')
 cat > /etc/kubernetes/token.csv <<EOF
-${BOOTSTRAP_TOKEN},kubelet-bootstrap,10001,"system:kubelet-bootstrap"
+${BOOTSTRAP_TOKEN},kubelet-bootstrap,10001,"system:bootstrappers"
 EOF
 
 export BOOTSTRAP_TOKEN=$(cat /etc/kubernetes/token.csv)
