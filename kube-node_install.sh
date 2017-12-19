@@ -80,7 +80,7 @@ KUBELET_ADDRESS="--address='$SERVER_IP'"
 KUBELET_PORT="--port=10250"
 KUBELET_HOSTNAME="--hostname-override='$HOSTNAME'"
 KUBELET_POD_INFRA_CONTAINER="--pod-infra-container-image=registry.example.com/kube/pause-amd64:3.0"
-KUBELET_ARGS="--network-plugin=cni --pod-manifest-path=/etc/kubernetes/manifests --runtime-cgroups=/systemd/system.slice --cgroup-driver=systemd --bootstrap-kubeconfig=/etc/kubernetes/bootstrap.kubeconfig --kubeconfig=/etc/kubernetes/kubelet.kubeconfig --fail-swap-on=false --cert-dir=/etc/kubernetes/ssl --cluster-dns='$CLUSTER_DNS_SVC_IP' --cluster-domain='$CLUSTER_DNS_DOMAIN' --serialize-image-pulls=false --register-node=true  --feature-gates=AllAlpha=true --system-reserved=cpu=100m,memory=1G --kube-reserved=cpu=200m,memory=2G  --protect-kernel-defaults"
+KUBELET_ARGS="--network-plugin=cni --pod-manifest-path=/etc/kubernetes/manifests --runtime-cgroups=/systemd/system.slice --cgroup-driver=systemd --bootstrap-kubeconfig=/etc/kubernetes/bootstrap.kubeconfig --kubeconfig=/etc/kubernetes/kubelet.kubeconfig --fail-swap-on=false --cert-dir=/etc/kubernetes/ssl --cluster-dns='$CLUSTER_DNS_SVC_IP' --cluster-domain='$CLUSTER_DNS_DOMAIN' --serialize-image-pulls=false --register-node=true  --feature-gates=AllAlpha=true --system-reserved=cpu=100m,memory=1G --kube-reserved=cpu=200m,memory=2G  --protect-kernel-defaults "
 '>/etc/kubernetes/kubelet
 
 echo -ne '
