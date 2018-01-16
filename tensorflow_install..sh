@@ -5,3 +5,5 @@ if [ ! -f /dev/nvidiactl ] ; then
 elif:
     pip install tensorflow-gpu
 fi
+
+pip install tensorflow-serving-api
