@@ -33,6 +33,8 @@ rm -rf /usr/bin/pip && ln -s /usr/bin/pip3.6 /usr/bin/pip
 
 curl -s https://raw.githubusercontent.com/xiaomatech/tools/master/talib.sh | bash -s --
 
+pip install beautifulsoup4 requests pandas
+
 echo -ne 'asn1crypto
 algocoin
 amqp
