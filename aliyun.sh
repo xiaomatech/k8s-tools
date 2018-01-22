@@ -22,8 +22,8 @@ yum remove -y postfix ius-release iwl*-firmware wpa_supplicant
 
 sed -i 's|#!/usr/bin/python|#! /usr/bin/python2.7|g' /usr/bin/yum
 sed -i 's|#! /usr/bin/python|#!/usr/bin/python2.7|g' /usr/libexec/urlgrabber-ext-down
-sed -i 's|# Port 22|Port 16120|g' /etc/ssh/sshd_config
-sed -i 's|# Port 22|Port 16120|g' /etc/ssh/ssh_config
+sed -i 's|#Port 22|Port 16120|g' /etc/ssh/sshd_config
+sed -i 's|#   Port 22|Port 16120|g' /etc/ssh/ssh_config
 
 
 rm -rf /usr/bin/python && ln -s /usr/bin/python3.6 /usr/bin/python
