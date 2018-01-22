@@ -6,7 +6,7 @@ Welcome to AutoTrade !
 
 '>/etc/motd
 
-rm -rf /usr/sbin/aliyun*
+rm -rf /usr/sbin/aliyun* /usr/local/aegis
 
 chkconfig --del agentwatch
 
