@@ -18,6 +18,8 @@ yum install -y python36u python36u-devel python36u-pip python36u-lxml python36u-
 
 hostnamectl set-hostname autotrade
 
+tuned-adm profile throughput-performance
+
 yum remove -y postfix ius-release iwl*-firmware wpa_supplicant
 
 sed -i 's|#!/usr/bin/python|#! /usr/bin/python2.7|g' /usr/bin/yum
