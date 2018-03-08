@@ -86,7 +86,7 @@ KUBE_API_PORT=" --insecure-port=8080 --secure-port=443"
 KUBE_API_ADDRESS=" --advertise-address='$SERVER_IP' --bind-address='$SERVER_IP' --insecure-bind-address='$SERVER_IP'"
 KUBE_ETCD_SERVERS=" --etcd-servers='$ETCD_ENDPOINTS'"
 KUBE_SERVICE_ADDRESSES=" --service-cluster-ip-range='$SERVICE_CIDR' --service-node-port-range=8400-32767 --tls-cert-file=/etc/kubernetes/ssl/kubernetes.pem --tls-private-key-file=/etc/kubernetes/ssl/kubernetes-key.pem --client-ca-file=/etc/kubernetes/ssl/ca.pem --service-account-key-file=/etc/kubernetes/ssl/ca-key.pem --token-auth-file=/etc/kubernetes/token.csv"
-KUBE_ADMISSION_CONTROL=" --admission-control=NamespaceLifecycle,LimitRanger,ServiceAccount,ResourceQuota,DefaultStorageClass,Initializers,PersistentVolumeClaimResize,PodNodeSelector,PodPreset,PodTolerationRestriction,Priority,DefaultTolerationSeconds "
+KUBE_ADMISSION_CONTROL=" --admission-control=NamespaceLifecycle,LimitRanger,ServiceAccount,ResourceQuota,DefaultStorageClass,Initializers,PersistentVolumeClaimResize,PodNodeSelector,PodPreset,PodTolerationRestriction,Priority,DefaultTolerationSeconds,NamespaceExists,NodeRestriction,DenyEscalatingExec,PersistentVolumeLabel"
 KUBE_API_ARGS=" --runtime-config=api/all=true --authorization-mode=RBAC --max-requests-inflight=10000 --audit-log-maxage=30 --audit-log-maxbackup=3 --audit-log-maxsize=100 --audit-log-path=/var/log/audit.log --feature-gates=AllAlpha=true "
 '>/etc/kubernetes/apiserver
 
