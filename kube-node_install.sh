@@ -58,6 +58,8 @@ Requires=docker.service
 WorkingDirectory=/var/lib/kubelet
 EnvironmentFile=-/etc/kubernetes/config
 EnvironmentFile=-/etc/kubernetes/kubelet
+ExecStartPre=/usr/bin/mkdir -p /sys/fs/cgroup/cpuset/system.slice/kubelet.service
+ExecStartPre=/usr/bin/mkdir -p /sys/fs/cgroup/hugetlb/system.slice/kubelet.service
 ExecStart=/usr/bin/kubelet \
     $KUBE_LOGTOSTDERR \
     $KUBE_LOG_LEVEL \
@@ -80,7 +82,7 @@ KUBELET_ADDRESS="--address='$SERVER_IP'"
 KUBELET_PORT="--port=10250"
 KUBELET_HOSTNAME="--hostname-override='$HOSTNAME'"
 KUBELET_POD_INFRA_CONTAINER="--pod-infra-container-image=registry.example.com/kube/pause-amd64:3.0"
-KUBELET_ARGS="--rotate-certificates --network-plugin=cni --pod-manifest-path=/etc/kubernetes/manifests --runtime-cgroups=/systemd/system.slice --cgroup-driver=systemd --bootstrap-kubeconfig=/etc/kubernetes/bootstrap.kubeconfig --kubeconfig=/etc/kubernetes/kubelet.kubeconfig --fail-swap-on=false --cert-dir=/etc/kubernetes/ssl --cluster-dns='$CLUSTER_DNS_SVC_IP' --cluster-domain='$CLUSTER_DNS_DOMAIN' --serialize-image-pulls=false --register-node=true  --feature-gates=AllAlpha=true --system-reserved=cpu=100m,memory=1G --kube-reserved=cpu=200m,memory=2G  --protect-kernel-defaults "
+KUBELET_ARGS="--rotate-certificates --network-plugin=cni --pod-manifest-path=/etc/kubernetes/manifests --runtime-cgroups=/systemd/system.slice --cgroup-driver=systemd --bootstrap-kubeconfig=/etc/kubernetes/bootstrap.kubeconfig --kubeconfig=/etc/kubernetes/kubelet.kubeconfig --fail-swap-on=false --cert-dir=/etc/kubernetes/ssl --cluster-dns='$CLUSTER_DNS_SVC_IP' --cluster-domain='$CLUSTER_DNS_DOMAIN' --serialize-image-pulls=false --register-node=true  --feature-gates=AllAlpha=true --cgroups-per-qos=true --enforce-node-allocatable=pods,kube-reserved,system-reserved --kube-reserved-cgroup=/kubelet.service --system-reserved-cgroup=/system.slice --kube-reserved=cpu=1,memory=2Gi,ephemeral-storage=1Gi --system-reserved=cpu=500m,memory=1Gi,ephemeral-storage=1Gi --eviction-hard=memory.available<500Mi,nodefs.available<10%  --protect-kernel-defaults "
 '>/etc/kubernetes/kubelet
 
 echo -ne '
