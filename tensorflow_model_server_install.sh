@@ -11,7 +11,7 @@ cd serving
 cd tensorflow
 ./configure
 cd ..
-bazel build -c opt --copt=-msse4.1 --copt=-msse4.2 --copt=-mavx --copt=-mavx2 --copt=-mfma --copt=-mfpmath=both --copt=-O3 tensorflow_serving/...
+bazel build -c opt --config=mkl --copt=-msse4.1 --copt=-msse4.2 --copt=-mavx --copt=-mavx2 --copt=-mfma --copt=-mfpmath=both --copt=-O3 tensorflow_serving/...
 
 ll bazel-bin/tensorflow_serving/model_servers/tensorflow_model_server
 
