@@ -14,6 +14,9 @@ NODE_PORT_RANGE="8400-90000"
 # etcd 集群服务地址列表
 ETCD_ENDPOINTS="https://10.64.3.7:2379,https://10.64.3.8:2379,https://10.66.3.86:2379"
 
+#event etcd 集群服务地址列表
+EVENT_ETCD_ENDPOINTS="https://10.64.3.7:2379,https://10.64.3.8:2379,https://10.66.3.86:2379"
+
 # kubernetes 网络配置前缀
 NETWORK_PLUGIN_ETCD_PREFIX="/kubernetes/network"
 
