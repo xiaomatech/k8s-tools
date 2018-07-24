@@ -84,10 +84,10 @@ KUBE_MASTER="--master='$KUBE_APISERVER'"
 echo -ne '
 KUBE_API_PORT=" --insecure-port=8080 --secure-port=443"
 KUBE_API_ADDRESS=" --advertise-address='$SERVER_IP' --bind-address='$SERVER_IP' --insecure-bind-address='$SERVER_IP'"
-KUBE_ETCD_SERVERS=" --etcd-servers='$ETCD_ENDPOINTS'"
+KUBE_ETCD_SERVERS=" --etcd-servers='$ETCD_ENDPOINTS' --etcd-servers-overrides="/events#'$EVENT_ETCD_ENDPOINTS'""
 KUBE_SERVICE_ADDRESSES=" --service-cluster-ip-range='$SERVICE_CIDR' --service-node-port-range=8400-32767 --tls-cert-file=/etc/kubernetes/ssl/kubernetes.pem --tls-private-key-file=/etc/kubernetes/ssl/kubernetes-key.pem --client-ca-file=/etc/kubernetes/ssl/ca.pem --service-account-key-file=/etc/kubernetes/ssl/ca-key.pem --token-auth-file=/etc/kubernetes/token.csv"
 KUBE_ADMISSION_CONTROL=" --admission-control=NamespaceLifecycle,LimitRanger,ServiceAccount,ResourceQuota,DefaultStorageClass,Initializers,PersistentVolumeClaimResize,PodNodeSelector,PodPreset,PodTolerationRestriction,Priority,DefaultTolerationSeconds,NamespaceExists,NodeRestriction,DenyEscalatingExec,PersistentVolumeLabel"
-KUBE_API_ARGS=" --runtime-config=api/all=true --authorization-mode=RBAC --max-requests-inflight=10000 --audit-log-maxage=30 --audit-log-maxbackup=3 --audit-log-maxsize=100 --audit-log-path=/var/log/audit.log --feature-gates=AllAlpha=true "
+KUBE_API_ARGS=" --max-requests-inflight=3000 --max-mutating-requests-inflight=1000 --runtime-config=api/all=true --authorization-mode=RBAC --max-requests-inflight=10000 --audit-log-maxage=30 --audit-log-maxbackup=3 --audit-log-maxsize=100 --audit-log-path=/var/log/audit.log --feature-gates=AllAlpha=true "
 '>/etc/kubernetes/apiserver
 
 echo -ne '[Manager]
@@ -121,7 +121,7 @@ WantedBy=multi-user.target
 '>/usr/lib/systemd/system/kube-controller-manager.service
 
 echo -ne '
-KUBE_CONTROLLER_MANAGER_ARGS=" --feature-gates=AllAlpha=true --address='$SERVER_IP' --service-cluster-ip-range='$SERVICE_CIDR' --cluster-name=kubernetes --controllers=*,bootstrapsigner,tokencleaner --cluster-signing-cert-file=/etc/kubernetes/ssl/ca.pem --cluster-signing-key-file=/etc/kubernetes/ssl/ca-key.pem  --service-account-private-key-file=/etc/kubernetes/ssl/ca-key.pem --root-ca-file=/etc/kubernetes/ssl/ca.pem --leader-elect=true --cloud-config= --cloud-provider="
+KUBE_CONTROLLER_MANAGER_ARGS=" --kube-api-qps=100 --kube-api-burst=100 --feature-gates=AllAlpha=true --address='$SERVER_IP' --service-cluster-ip-range='$SERVICE_CIDR' --cluster-name=kubernetes --controllers=*,bootstrapsigner,tokencleaner --cluster-signing-cert-file=/etc/kubernetes/ssl/ca.pem --cluster-signing-key-file=/etc/kubernetes/ssl/ca-key.pem  --service-account-private-key-file=/etc/kubernetes/ssl/ca-key.pem --root-ca-file=/etc/kubernetes/ssl/ca.pem --leader-elect=true --cloud-config= --cloud-provider="
 '>/etc/kubernetes/controller-manager
 
 
@@ -148,7 +148,7 @@ WantedBy=multi-user.target
 '>/usr/lib/systemd/system/kube-scheduler.service
 
 echo -ne '
-KUBE_SCHEDULER_ARGS=" --address='$SERVER_IP' --feature-gates=AllAlpha=true"
+KUBE_SCHEDULER_ARGS=" --kube-api-qps=100 --address='$SERVER_IP' --feature-gates=AllAlpha=true"
 '>/etc/kubernetes/scheduler
 
 chown -R kube:kube /etc/kubernetes /var/log/kube
