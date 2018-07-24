@@ -34,7 +34,7 @@ echo -ne 'activation {
 '>/etc/lvm/profile/docker-thinpool.profile
 
 echo -ne '
-OPTIONS=" --selinux-enabled=false --log-driver=journald -s devicemapper --default-ulimit nofile=2560000:2560000 "
+OPTIONS=" --max-concurrent-downloads=10 --selinux-enabled=false --log-driver=journald -s devicemapper --default-ulimit nofile=2560000:2560000 "
 DOCKER_CERT_PATH=/etc/docker
 ADD_REGISTRY="--add-registry='$REG_URL'"
 INSECURE_REGISTRY="--insecure-registry='$REG_URL'"
