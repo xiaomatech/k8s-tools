@@ -64,7 +64,8 @@ ExecStart=/usr/bin/kube-apiserver \
     $KUBE_ALLOW_PRIV \
     $KUBE_SERVICE_ADDRESSES \
     $KUBE_ADMISSION_CONTROL \
-    $KUBE_API_ARGS
+    $KUBE_API_ARGS \
+    $KUBE_API_METRIC_SERVER_ARGS
 Restart=on-failure
 Type=notify
 LimitNOFILE=65536
@@ -88,6 +89,7 @@ KUBE_ETCD_SERVERS=" --etcd-servers='$ETCD_ENDPOINTS' --etcd-servers-overrides="/
 KUBE_SERVICE_ADDRESSES=" --service-cluster-ip-range='$SERVICE_CIDR' --service-node-port-range=8400-32767 --tls-cert-file=/etc/kubernetes/ssl/kubernetes.pem --tls-private-key-file=/etc/kubernetes/ssl/kubernetes-key.pem --client-ca-file=/etc/kubernetes/ssl/ca.pem --service-account-key-file=/etc/kubernetes/ssl/ca-key.pem --token-auth-file=/etc/kubernetes/token.csv"
 KUBE_ADMISSION_CONTROL=" --admission-control=NamespaceLifecycle,LimitRanger,ServiceAccount,ResourceQuota,DefaultStorageClass,Initializers,PersistentVolumeClaimResize,PodNodeSelector,PodPreset,PodTolerationRestriction,Priority,DefaultTolerationSeconds,NamespaceExists,NodeRestriction,DenyEscalatingExec,PersistentVolumeLabel"
 KUBE_API_ARGS=" --max-requests-inflight=3000 --max-mutating-requests-inflight=1000 --runtime-config=api/all=true --authorization-mode=RBAC --max-requests-inflight=10000 --audit-log-maxage=30 --audit-log-maxbackup=3 --audit-log-maxsize=100 --audit-log-path=/var/log/audit.log --feature-gates=AllAlpha=true "
+KUBE_API_METRIC_SERVER_ARGS = "--requestheader-client-ca-file=/etc/kubernetes/ssl/proxy-ca.crt --proxy-client-cert-file=/etc/kubernetes/ssl/proxy.crt --proxy-client-key-file=/etc/kubernetes/ssl/proxy.key --requestheader-allowed-names=aggregator --requestheader-extra-headers-prefix=X-Remote-Extra- --requestheader-group-headers=X-Remote-Group --requestheader-username-headers=X-Remote-User"
 '>/etc/kubernetes/apiserver
 
 echo -ne '[Manager]
