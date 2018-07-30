@@ -98,7 +98,8 @@ ExecStart=/usr/bin/kube-proxy \
     $KUBE_LOGTOSTDERR \
     $KUBE_LOG_LEVEL \
     $KUBE_MASTER \
-    $KUBE_PROXY_ARGS
+    $KUBE_PROXY_ARGS \
+    $KUBE_PROXY_IPVS_ARGS
 Restart=on-failure
 LimitNOFILE=65536
 
@@ -107,7 +108,8 @@ WantedBy=multi-user.target
 '>/usr/lib/systemd/system/kube-proxy.service
 
 echo -ne '
-KUBE_PROXY_ARGS="--kubeconfig=/etc/kubernetes/kube-proxy.kubeconfig --bind-address='$SERVER_IP' --hostname-override='$HOSTNAME' --cluster-cidr='$CLUSTER_CIDR'  --feature-gates=AllAlpha=true"
+KUBE_PROXY_ARGS=" --kubeconfig=/etc/kubernetes/kube-proxy.kubeconfig --bind-address='$SERVER_IP' --hostname-override='$HOSTNAME' --cluster-cidr='$CLUSTER_CIDR'  --feature-gates=AllAlpha=true"
+KUBE_PROXY_IPVS_ARGS=" --masquerade-all --proxy-mode=ipvs --ipvs-min-sync-period=5s --ipvs-sync-period=5s --ipvs-scheduler=rr "
 '>/etc/kubernetes/proxy
 
 echo -ne '[Manager]
