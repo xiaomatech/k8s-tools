@@ -4,7 +4,7 @@ DEVS="/dev/sdb /dev/sdc /dev/sdd /dev/sde /dev/sdf /dev/sdg"
 CIDR="10.3.136.1/24"
 REG_URL="registry.example.com"
 
-yum install -y docker
+yum install -y docker lxcfs
 
 #docker storage
 if [ ! -f /dev/mapper/docker--pool-thinpool ];then
@@ -85,6 +85,23 @@ Restart=on-abnormal
 WantedBy=multi-user.target
 '>/usr/lib/systemd/system/docker.service
 
+echo -ne '[Unit]
+Description=FUSE filesystem for LXC
+ConditionVirtualization=!container
+Before=lxc.service
+Documentation=man:lxcfs(1)
+ 
+[Service]
+ExecStart=/usr/bin/lxcfs /var/lib/lxcfs/
+KillMode=process
+Restart=on-failure
+ExecStopPost=-/bin/fusermount -u /var/lib/lxcfs
+Delegate=yes
+ 
+[Install]
+WantedBy=multi-user.target
+'>/usr/lib/systemd/system/lxcfs.service
+
 systemctl daemon-reload
-systemctl enable docker
-systemctl start docker
+systemctl enable docker lxcfs
+systemctl start docker lxcfs
